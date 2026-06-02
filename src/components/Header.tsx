@@ -8,7 +8,7 @@ import { useState } from "react"
 
 export function Header() {
   const { data: session } = useSession()
-  const itemCount = useCartStore((s) => s.getItemCount())
+  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0))
   const [menuOpen, setMenuOpen] = useState(false)
 
   const user = session?.user as any

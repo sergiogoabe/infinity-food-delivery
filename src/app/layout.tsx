@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Toaster } from "react-hot-toast"
 import { SessionProvider } from "@/components/SessionProvider"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import "./globals.css"
@@ -20,19 +21,21 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="min-h-screen flex flex-col bg-gray-50">
-        <SessionProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: { background: "#1e293b", color: "#fff", borderRadius: "8px" },
-              success: { iconTheme: { primary: "#16a34a", secondary: "#fff" } },
-              error: { iconTheme: { primary: "#dc2626", secondary: "#fff" } },
-            }}
-          />
-        </SessionProvider>
+        <ErrorBoundary>
+          <SessionProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: { background: "#1e293b", color: "#fff", borderRadius: "8px" },
+                success: { iconTheme: { primary: "#16a34a", secondary: "#fff" } },
+                error: { iconTheme: { primary: "#dc2626", secondary: "#fff" } },
+              }}
+            />
+          </SessionProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

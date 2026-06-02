@@ -65,19 +65,13 @@ export async function getHandlers() {
   return _handlers
 }
 
-export async function getAuth() {
-  if (_auth !== null) return _auth
+export async function auth() {
+  if (_auth !== null) return _auth()
   try {
     const handlers = await getHandlers()
     _auth = handlers.auth
+    return _auth()
   } catch {
-    _auth = null
+    return null
   }
-  return _auth
-}
-
-export async function auth() {
-  const fn = await getAuth()
-  if (fn) return fn()
-  return null
 }
