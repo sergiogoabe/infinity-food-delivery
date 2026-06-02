@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  phone     String?
+  role      String   @default("customer")
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store   Store?
+  orders  Order[]
+  reviews Review[]
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  address     String
+  latitude    Float?
+  longitude   Float?
+  phone       String?
+  image       String?
+  coverImage  String?
+  category    String   @default("all")
+  isActive    Boolean  @default(true)
+  deliveryFee Float    @default(5.0)
+  freeDeliveryMin Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId  String    @unique
+  owner    User      @relation(fields: [ownerId], references: [id])
+  products Product[]
+  orders   Order[]
+  reviews  Review[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  category    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  status        String   @default("pending")
+  total         Float
+  deliveryFee   Float    @default(0)
+  subtotal      Float
+  address       String
+  latitude      Float?
+  longitude     Float?
+  paymentMethod String   @default("cash")
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId  String
+  user    User       @relation(fields: [userId], references: [id])
+  storeId String
+  store   Store      @relation(fields: [storeId], references: [id])
+  items   OrderItem[]
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  quantity Int
+  price    Float
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storeId])
+}
